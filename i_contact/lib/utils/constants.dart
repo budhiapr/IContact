@@ -7,6 +7,7 @@ class Constants {
 
   static const String LABEL_BUTTON_LOGIN = 'Login';
   static const String LABEL_BUTTON_LOGOUT = 'Logout';
+  static const String LABEL_LOGOUT_SUCCESSFULLY = 'Logout';
 
   static const String LABEL_FORM_LOGIN = 'User ID';
   static const String LABEL_IS_REQUIRED = ' *';
@@ -37,4 +38,8 @@ class Constants {
 
   static const String ERROR_USER_NOT_FOUND =
       'User ID not found. Please try again';
+
+  static const String LABEL_EMAIL_NOT_PROVIDED = 'Email not provided';
+
+  static const String LABEL_DOB_NOT_PROVIDED = 'Date of birth not provided';
 }

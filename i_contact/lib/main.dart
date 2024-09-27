@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:i_contact/blocs/auth/bloc/auth_bloc.dart';
 import 'package:i_contact/blocs/base/bloc/base_bloc.dart';
 import 'package:i_contact/blocs/bottom_navigation/bloc/bottom_navigation_bloc.dart';
+import 'package:i_contact/blocs/logout/bloc/logout_bloc.dart';
 import 'package:i_contact/blocs/repositories/auth_repositories/auth_repository_impl.dart';
+import 'package:i_contact/cubits/user_cubit/cubit/user_cubit.dart';
 import 'package:i_contact/pages/home_page.dart';
 import 'package:i_contact/pages/login_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,6 +28,8 @@ void main() {
             ),
           ),
           BlocProvider(create: (context) => BottomNavigationBloc()),
+          BlocProvider(create: (context) => LogoutBloc()),
+          BlocProvider(create: (context) => UserCubit()),
         ],
         child: const MainApp(), // Ganti dengan widget utama Anda
       ),

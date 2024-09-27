@@ -32,8 +32,8 @@ class ContactCardWidgetComponent extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: "${contact.firstName} ${contact.lastName} ",
-                    style: const TextStyle(
-                      color: ThemeAppColors.black,
+                    style: TextStyle(
+                      color: ThemeAppColors.black.withAlpha(99),
                       fontWeight: FontWeight.bold,
                     ),
                   ),

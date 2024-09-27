@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:i_contact/blocs/all_contact/bloc/all_contact_bloc.dart';
 import 'package:i_contact/blocs/base/bloc/base_bloc.dart';
+import 'package:i_contact/cubits/user_cubit/cubit/user_cubit.dart';
+import 'package:i_contact/cubits/user_cubit/cubit/user_state.dart';
 import 'package:i_contact/utils/constants.dart';
 import 'package:i_contact/widgets/contact_card_widget_component.dart';
 import 'package:i_contact/widgets/loading_widget_component.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,32 +16,35 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String? loggedInUserId;
-
   @override
   void initState() {
-    getLoggedInUserId();
     super.initState();
-  }
-
-  Future<void> getLoggedInUserId() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      loggedInUserId = prefs.getString(
-          'loggedInUserId'); // Retrieve user ID from SharedPreferences
-    });
+    // Fetch logged in user ID when HomeScreen is initialized
+    context.read<UserCubit>().fetchLoggedInUserId();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(Constants.LABEL_MY_CONTACTS),
+        title: const Text(
+          Constants.LABEL_MY_CONTACTS,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
-      body: BlocProvider(
-        create: (context) =>
-            AllContactBloc()..add(const AllContactEvent.getAllContact()),
-        child: ContactListView(loggedInUserId: loggedInUserId ?? ""),
+      body: BlocBuilder<UserCubit, UserState>(
+        builder: (context, userState) {
+          return userState.when(
+            initial: () => const LoadingWidgetComponent(),
+            loading: () => const LoadingWidgetComponent(),
+            loaded: (loggedInUserId) => BlocProvider(
+              create: (context) =>
+                  AllContactBloc()..add(const AllContactEvent.getAllContact()),
+              child: ContactListView(loggedInUserId: loggedInUserId),
+            ),
+            error: (message) => Center(child: Text(message)),
+          );
+        },
       ),
     );
   }
@@ -56,8 +60,6 @@ class ContactListView extends StatefulWidget {
 
 class _ContactListViewState extends State<ContactListView> {
   final TextEditingController _searchController = TextEditingController();
-
-  get next => null;
 
   @override
   Widget build(BuildContext context) {
@@ -83,34 +85,36 @@ class _ContactListViewState extends State<ContactListView> {
           child: BlocBuilder<AllContactBloc, BaseState<AllContactState>>(
             builder: (context, state) {
               return state.when(
-                  loading: (_) => const LoadingWidgetComponent(),
-                  next: (dataNext) {
-                    return dataNext.map(loadedAllContact: (loaded) {
-                      return GridView.builder(
-                        padding: const EdgeInsets.all(8.0),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 8.0,
-                          crossAxisSpacing: 8.0,
-                          childAspectRatio: 1,
-                        ),
-                        itemCount: loaded.loadedAllContact.length,
-                        itemBuilder: (context, index) {
-                          final contact = loaded.loadedAllContact[index];
-                          final isCurrentUser =
-                              contact.id == widget.loggedInUserId;
+                loading: (_) => const LoadingWidgetComponent(),
+                next: (dataNext) {
+                  return dataNext.map(loadedAllContact: (loaded) {
+                    return GridView.builder(
+                      padding: const EdgeInsets.all(8.0),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 8.0,
+                        crossAxisSpacing: 8.0,
+                        childAspectRatio: 1,
+                      ),
+                      itemCount: loaded.loadedAllContact.length,
+                      itemBuilder: (context, index) {
+                        final contact = loaded.loadedAllContact[index];
+                        final isCurrentUser =
+                            contact.id == widget.loggedInUserId;
 
-                          return ContactCardWidgetComponent(
-                              contact: loaded.loadedAllContact[index],
-                              isCurrentUser: isCurrentUser);
-                        },
-                      );
-                    });
-                  },
-                  error: (error) {
-                    return const Center(child: Text('No contacts found.'));
+                        return ContactCardWidgetComponent(
+                          contact: contact,
+                          isCurrentUser: isCurrentUser,
+                        );
+                      },
+                    );
                   });
+                },
+                error: (error) {
+                  return const Center(child: Text('No contacts found.'));
+                },
+              );
             },
           ),
         ),
