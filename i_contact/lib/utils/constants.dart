@@ -15,6 +15,7 @@ class Constants {
   static const String LABEL_CONTACT_DETAILS = 'Contact Details';
   static const String LABEL_MY_CONTACTS = 'My Contacts';
   static const String LABEL_MY_PROFILE = 'My Profile';
+  static const String LABEL_YOU = '(You)';
 
   static const String LABEL_MAIN_INFORMATION = 'Main Information';
   static const String LABEL_FIRST_NAME = 'First Name';

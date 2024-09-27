@@ -55,11 +55,30 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<ContactModel> getProfile() {
-    // TODO: implement getProfile
-    throw UnimplementedError();
+  Future<LoginResult> getProfile() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('loggedInUserId');
+
+    List<ContactModel> contacts = [];
+
+    contacts = await loadContacts();
+
+    try {
+      contacts = await loadContacts();
+
+      final user = contacts.firstWhereOrNull((contact) => contact.id == userId);
+
+      if (user == null) {
+        return LoginResult(errorMessage: 'User Not Found');
+      }
+
+      return LoginResult(user: ContactModel.fromJson(user.toJson()));
+    } catch (e) {
+      return LoginResult(errorMessage: e.toString());
+    }
   }
 
+  @override
   Future<List<ContactModel>> loadContacts() async {
     final String response = await rootBundle.loadString('lib/data/data.json');
     final List<dynamic> data = json.decode(response);

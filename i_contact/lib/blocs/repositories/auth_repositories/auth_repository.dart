@@ -5,6 +5,6 @@ abstract class AuthRepository {
   Future<LoginResult> login(String userId);
   Future<List<ContactModel>> loadContacts();
   Future<bool> getIsLoggedIn();
-  Future<ContactModel> getProfile();
+  Future<LoginResult> getProfile();
   Future<void> saveSessionLoggedIn(String userId);
 }
