@@ -19,7 +19,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch logged in user ID when HomeScreen is initialized
     context.read<UserCubit>().fetchLoggedInUserId();
   }
 
